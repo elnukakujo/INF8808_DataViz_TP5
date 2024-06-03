@@ -18,3 +18,6 @@ In the project folder:
 - cd src
 - python3.10 server.py  
 - After, open the localhost:8050 in your browser  
+
+## TODOS
+in preprocess.py, map_viz.py, hover_template.py, callback.py
