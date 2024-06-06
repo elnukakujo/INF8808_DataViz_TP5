@@ -38,7 +38,9 @@ def add_choro_trace(fig, montreal_data, locations, z_vals, colorscale):
         colorscale=colorscale,
         showscale=False,
         marker_line_color='black',
-        marker_opacity=0.5
+        marker_opacity=0.5,
+        hovertemplate=hover.map_base_hover_template(),
+        customdata=locations
     ))
     return fig
 
@@ -67,7 +69,8 @@ def add_scatter_traces(fig, street_df):
                 marker=dict(
                     size = 20
                 ),
-                name=type
+                name=type,
+                hovertemplate=hover.map_marker_hover_template(type)
             )
         )
     return fig
