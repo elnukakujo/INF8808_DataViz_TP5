@@ -70,5 +70,5 @@ def get_neighborhoods(montreal_data):
                 neighborhoods in the data set
     '''
     # TODO : Return the array of neighborhoods
-    locations= [d.get('properties', None) for d in montreal_data['features']]
-    return pd.json_normalize(locations)
+    locations= [d.get('properties', None)['NOM'] for d in montreal_data['features']]
+    return locations
