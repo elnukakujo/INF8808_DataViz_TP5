@@ -5,7 +5,6 @@
 
 import plotly.graph_objects as go
 import plotly.express as px
-
 import hover_template as hover
 
 
@@ -30,7 +29,19 @@ def add_choro_trace(fig, montreal_data, locations, z_vals, colorscale):
 
     '''
     # TODO : Draw the map base
-    return None
+    fig.add_trace(go.Choroplethmapbox(
+        geojson=montreal_data, 
+        locations=locations, 
+        z=z_vals,
+        featureidkey='properties.NOM',
+        colorscale=colorscale,
+        showscale=False,
+        marker_line_color='black',
+        marker_opacity=0.5,
+        hovertemplate=hover.map_base_hover_template(),
+        customdata=locations
+    ))
+    return fig
 
 
 def add_scatter_traces(fig, street_df):
@@ -48,4 +59,13 @@ def add_scatter_traces(fig, street_df):
 
     '''
     # TODO : Add the scatter markers to the map base
-    return None
+    scatter=px.scatter_mapbox(
+                street_df,
+                lon=street_df['properties.LONGITUDE'],
+                lat=street_df['properties.LATITUDE'],
+                color='properties.TYPE_SITE_INTERVENTION'
+        ).data
+    for trace in scatter:
+        trace['hovertemplate']=hover.map_marker_hover_template(trace.name)
+        trace['marker']['size']=20
+    return fig.add_traces(scatter)
