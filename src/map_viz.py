@@ -5,7 +5,7 @@
 
 import plotly.graph_objects as go
 import plotly.express as px
-
+import random
 import hover_template as hover
 
 
@@ -59,18 +59,16 @@ def add_scatter_traces(fig, street_df):
             The figure now containing the scatter trace
 
     '''
-    # TODO : Add the scatter markers to the map base    
-    for type in street_df['properties.TYPE_SITE_INTERVENTION'].unique():
-        type_df=street_df.loc[street_df['properties.TYPE_SITE_INTERVENTION']==type]
-        fig.add_trace(
-            go.Scattermapbox(
-                lon=type_df['properties.LONGITUDE'],
-                lat=type_df['properties.LATITUDE'],
-                marker=dict(
-                    size = 20
-                ),
-                name=type,
-                hovertemplate=hover.map_marker_hover_template(type)
+    # TODO : Add the scatter markers to the map base
+    scatter=px.scatter_mapbox(
+                street_df,
+                lon=street_df['properties.LONGITUDE'],
+                lat=street_df['properties.LATITUDE'],
+                color='properties.TYPE_SITE_INTERVENTION',
+                custom_data=['properties.TYPE_SITE_INTERVENTION']
             )
-        )
-    return fig
+    scatter.update_traces(
+        hovertemplate=hover.map_marker_hover_template('Hello'),
+        marker_size=20
+    )
+    return go.Figure(data = fig.data + scatter.data)

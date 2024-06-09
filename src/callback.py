@@ -3,7 +3,7 @@
     a click is detected on the map, depending on the context
 '''
 import dash_html_components as html
-
+import app 
 
 def no_clicks(style):
     '''
@@ -17,9 +17,11 @@ def no_clicks(style):
             theme: The updated display theme
             style: The updated display style for the panel
     '''
-    # TODO : Handle no clicks on the map
-    return None, None, None, None
-
+    title = ""
+    mode = ""
+    theme = ""
+    style = {**style, 'visibility': 'hidden'}  # Hide the panel
+    return title, mode, theme, style
 
 def map_base_clicked(title, mode, theme, style):
     '''
@@ -37,11 +39,15 @@ def map_base_clicked(title, mode, theme, style):
             theme: The updated display theme
             style: The updated display style for the panel
     '''
-    # TODO : Handle clicks on the map base
-    return None, None, None, None
+    if style.get('visibility') == 'visible':  # Panel is displayed
+        # Return the current panel information without any change
+        return title, mode, theme, style
+    else:  # Panel is not displayed
+        # Hide the panel
+        style = {**style, 'visibility': 'hidden'}
+        return title, mode, theme, style
 
-
-def map_marker_clicked(figure, curve, point, title, mode, theme, style): # noqa : E501 pylint: disable=unused-argument too-many-arguments line-too-long
+def map_marker_clicked(figure, curve, point, title, mode, theme, style):
     '''
         Deals with the case where a marker is clicked
 
@@ -59,5 +65,36 @@ def map_marker_clicked(figure, curve, point, title, mode, theme, style): # noqa 
             theme: The updated display theme
             style: The updated display style for the panel
     '''
-    # TODO : Handle clicks on the markers
-    return None, None, None, None
+    marker_data = figure['data'][curve]
+    lon = marker_data['lon'][point]
+    lat = marker_data['lat'][point]
+
+    # Find the corresponding feature in the original data
+    for feature in app.street_data['features']:  # Access street_df from app module
+        if feature['geometry']['coordinates'] == [lon, lat]:
+            properties = feature['properties']
+            break
+    else:
+        raise ValueError("Feature not found")
+
+    # Extract relevant properties
+    project_name = properties.get('NOM_PROJET', 'Unknown Project')
+    duration = properties.get('MODE_IMPLANTATION', 'Unknown Duration')
+    themes = properties.get('OBJECTIF_THEMATIQUE', '')
+    themes_list = themes.split('\n') if themes else []
+
+    # Creating the panel content
+    title = project_name
+    mode = duration
+    theme = html.Ul([html.Li(theme) for theme in themes_list])
+    
+    # Add color:
+    color = marker_data['marker']['color']
+    
+    # Apply the color to the displayed project name
+    #title = html.Span(title, style={'color': color})
+    title = html.Div(project_name, style={'color': color})
+    
+    style = {**style, 'visibility': 'visible'}  # Show the panel
+
+    return title, mode, theme, style
